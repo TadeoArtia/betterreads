@@ -1,5 +1,5 @@
 import {zodResolver} from "@hookform/resolvers/zod";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import React from "react";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
