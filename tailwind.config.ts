@@ -1,4 +1,4 @@
-import type {Config} from "tailwindcss"
+import type { Config } from "tailwindcss"
 
 const config = {
 	darkMode: ["class"],
@@ -22,7 +22,6 @@ const config = {
 				'grey': '#b0a78f',
 				'dark-grey': '#b3b3a6',
 				'light-grey': '#f4f4ea',
-				'color-primary': '#564718',
 				border: "hsl(var(--border))",
 				input: "hsl(var(--input))",
 				ring: "hsl(var(--ring))",
@@ -64,12 +63,12 @@ const config = {
 			},
 			keyframes: {
 				"accordion-down": {
-					from: {height: "0"},
-					to: {height: "var(--radix-accordion-content-height)"},
+					from: { height: "0" },
+					to: { height: "var(--radix-accordion-content-height)" },
 				},
 				"accordion-up": {
-					from: {height: "var(--radix-accordion-content-height)"},
-					to: {height: "0"},
+					from: { height: "var(--radix-accordion-content-height)" },
+					to: { height: "0" },
 				},
 			},
 			animation: {

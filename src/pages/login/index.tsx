@@ -42,7 +42,7 @@ export default function Home({
   });
 
   return (
-    <div className="m-0 flex h-screen w-screen items-center justify-center bg-grey">
+    <main className="m-0 flex h-screen w-screen items-center justify-center bg-grey">
       <div className="flex h-3/4 w-3/4 rounded-xl bg-light-grey">
         <div className="relative flex h-full w-3/5 items-center justify-center rounded-xl bg-color-primary">
           <Image
@@ -133,16 +133,12 @@ export default function Home({
           </span>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  console.log(context.req.headers.cookie);
   const session = await getServerSession(context.req, context.res, authOptions);
-  // If the user is already logged in, redirect.
-  // Note: Make sure not to redirect to the same page
-  // To avoid an infinite loop!
   if (session) {
     return { redirect: { destination: "/" } };
   }
