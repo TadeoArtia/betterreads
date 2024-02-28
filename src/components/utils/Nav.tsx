@@ -5,6 +5,7 @@ import { Session } from "next-auth";
 import { Button } from "../shadcn/ui/button";
 
 export default function Nav({ session }: { session: Session | null }) {
+  console.log(session);
   return (
     <nav className="flex items-center gap-5 bg-grey p-4 text-primary">
       {/* TODO Replace h1 with logo */}

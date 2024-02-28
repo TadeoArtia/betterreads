@@ -1,13 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { getServerSession } from "next-auth";
-import { signIn, getProviders, getCsrfToken } from "next-auth/react";
 import Image from "next/legacy/image";
 import Link from "next/link";
-import router from "next/router";
-import {
-  GetServerSidePropsContext,
-  InferGetServerSidePropsType,
-} from "next/types";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -17,48 +10,47 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormMessage,
 } from "~/components/shadcn/ui/form";
 import { Input } from "~/components/shadcn/ui/input";
 import { Separator } from "~/components/shadcn/ui/separator";
-import { authOptions } from "~/server/auth";
+import { api } from "~/utils/api";
 
-export default function Home({
-  providers,
-  csrfToken,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const loginSchema = z.object({
-    username: z.string().min(1),
-    password: z.string().min(6),
-  });
+export default function Home() {
+  const registerSchema = z
+    .object({
+      username: z.string().min(1),
+      password: z.string().min(8),
+      email: z.string().email(),
+      confirm: z.string(),
+    })
+    .refine((data) => data.password === data.confirm, {
+      message: "Passwords don't match",
+      path: ["confirm"], // path of error
+    });
 
-  type LoginFormData = z.infer<typeof loginSchema>;
+  type RegisterFormData = z.infer<typeof registerSchema>;
 
-  const defaultValues: Partial<LoginFormData> = {
+  const defaultValues: Partial<RegisterFormData> = {
     username: "",
     password: "",
+    email: "",
+    confirm: "",
   };
 
-  const form = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
     defaultValues,
   });
 
-  const handleLogin = async (data: LoginFormData) => {
-    const response = await signIn("credentials", {
-      redirect: false,
-      username: data.username,
-      password: data.password,
-    });
+  const createUserMutation = api.user.create.useMutation();
 
-    if (response?.ok) {
-      await router.push("/");
-      console.log("Login successful");
-    } else {
-      // toast({
-      //   title: "Error",
-      //   description: "Usuario o contraseña incorrectos",
-      // });
-      console.error("Usuario o contraseña incorrectos");
+  const onSubmit = async (data: RegisterFormData) => {
+    try {
+      const response = await createUserMutation.mutateAsync(data);
+      console.log(response);
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -77,7 +69,7 @@ export default function Home({
         </div>
         <div className="flex h-full w-2/5 flex-col items-center justify-center gap-1">
           <h1 className="mb-4 w-3/4 text-left text-3xl font-bold text-color-primary">
-            Login
+            Create an account
           </h1>
           <p className="mb-6 w-3/4 text-dark-grey">
             Access your account to meet your new favourite book
@@ -85,6 +77,22 @@ export default function Home({
 
           <Form {...form}>
             <div className="flex w-3/4 flex-col gap-5">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormControl>
+                      <Input
+                        {...field}
+                        className="w-full"
+                        placeholder="Email"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="username"
@@ -97,6 +105,7 @@ export default function Home({
                         placeholder="Username"
                       />
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -113,45 +122,45 @@ export default function Home({
                         placeholder="Password"
                       />
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
-              <input name="csrfToken" type="hidden" defaultValue={csrfToken} />
-
+              <FormField
+                control={form.control}
+                name="confirm"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormControl>
+                      <Input
+                        {...field}
+                        className="w-full"
+                        type="password"
+                        placeholder="Confirm Password"
+                      />
+                    </FormControl>
+                    <FormMessage>
+                      {form.formState.errors.confirm?.message}
+                    </FormMessage>
+                  </FormItem>
+                )}
+              />
               <Button
                 type="submit"
                 className="w-full"
-                onClick={form.handleSubmit((data) => handleLogin(data))}
+                onClick={form.handleSubmit((data) => onSubmit(data))}
               >
-                Login
+                Register
               </Button>
             </div>
           </Form>
-          <Link
-            className="mt-1 w-3/4 text-center text-xs text-primary hover:underline"
-            href="/forgot-password"
-          >
-            <p>Forgot your password?</p>
-          </Link>
           <Separator className="my-3 w-3/4" />
 
-          <div className="flex w-3/4 flex-col items-center justify-center gap-3 ">
-            {Object.values(providers).map((provider) => (
-              <button
-                key={provider.id}
-                className="w-full rounded-md bg-primary px-4 py-2 text-sm text-background"
-                onClick={() => signIn(provider.id)}
-              >
-                Sign in with {provider.name}
-              </button>
-            ))}
-          </div>
-          <Separator className="my-3 w-3/4 " />
           <span className="flex gap-2 text-xs">
-            Dont have an account?
-            <Link href="/register">
+            Already have an account?
+            <Link href="/login">
               <span className="w-3/4 text-center text-primary hover:underline">
-                Create an account
+                Login
               </span>
             </Link>
           </span>
@@ -159,20 +168,4 @@ export default function Home({
       </div>
     </main>
   );
-}
-
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const session = await getServerSession(context.req, context.res, authOptions);
-  if (session) {
-    return { redirect: { destination: "/" } };
-  }
-
-  const providers = await getProviders();
-
-  return {
-    props: {
-      providers: providers ?? [],
-      csrfToken: "",
-    },
-  };
 }

@@ -7,9 +7,11 @@ import {
 } from "next-auth";
 import { type Adapter } from "next-auth/adapters";
 import GoogleProvider from "next-auth/providers/google";
-
+import CredentialsProvider from "next-auth/providers/credentials";
 import { env } from "~/env";
 import { db } from "~/server/db";
+import { sha256 } from 'js-sha256';
+
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -39,20 +41,56 @@ declare module "next-auth" {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-      },
-    }),
+    session: ({ session, token }) => {
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: token?.id ?? "",
+        },
+      }
+    },
+    async jwt({ user, token }) {
+      //   update token from user
+      if (user) {
+        token.user = user;
+      }
+      //   return final_token
+      return token;
+    },
   },
+
   adapter: PrismaAdapter(db) as Adapter,
   providers: [
     GoogleProvider({
       clientId: "",
       clientSecret: "",
     }),
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        username: { label: "Username", type: "text", placeholder: "jsmith" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        console.log(credentials);
+        if (!credentials || !credentials.username || !credentials.password) return null;
+        const user = await db.user.findFirst({
+          where: { name: credentials.username },
+        });
+        console.log(user);
+        const hash = sha256.create();
+        hash.update(credentials.password + env.SALT);
+        const hex = hash.hex();
+        if (user && hex === user.password) {
+          const { password, ...userdata } = user;
+          return userdata;
+        } else {
+          console.log('error');
+          return null;
+        }
+      },
+    })
     /**
      * ...add more providers here.
      *
@@ -63,6 +101,9 @@ export const authOptions: NextAuthOptions = {
      * @see https://next-auth.js.org/providers/github
      */
   ],
+  session: {
+    strategy: "jwt",
+  }
 };
 
 /**

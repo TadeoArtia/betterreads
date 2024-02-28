@@ -1,20 +1,7 @@
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
-import { getServerSession } from "next-auth";
+import { useSession } from "next-auth/react";
 import Layout from "~/components/utils/Layout";
-import { authOptions } from "~/server/auth";
 
-export default function Home({
-  session,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  return <Layout session={session}>Betterreads!</Layout>;
-}
-
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const session = await getServerSession(context.req, context.res, authOptions);
-
-  return {
-    props: {
-      session,
-    },
-  };
+export default function Home() {
+  const session = useSession();
+  return <Layout session={session.data}>Betterreads!</Layout>;
 }

@@ -11,6 +11,7 @@ export default function Layout({
   session: Session | null;
   children: React.ReactNode;
 }) {
+  console.log("LAYOUT", session);
   return (
     <div>
       <Nav session={session} />
