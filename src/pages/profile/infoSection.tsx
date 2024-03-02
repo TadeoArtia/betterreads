@@ -4,10 +4,12 @@ import {type ChangeEvent, useRef} from "react";
 import {capitalize, uploadImageToImgur} from "~/lib/utils";
 import {api} from "~/utils/api";
 
-export default function InfoSection() {
+export default function InfoSection(props: {
+	userProfile: any,
+	refetch: any
+}) {
 	const session = useSession();
 	const updateImageMutation = api.user.updateProfileImage.useMutation();
-	const {data: userProfile, isLoading, refetch} = api.user.getUserProfile.useQuery({id: session.data?.user.id ?? ""});
 
 	const inputFileRef = useRef<HTMLInputElement | null>(null);
 
@@ -27,14 +29,14 @@ export default function InfoSection() {
 					image: url
 				}
 			);
-			await refetch();
+			await props.refetch();
 		} catch
 			(error) {
 			console.error('Error al subir la imagen:', error);
 		}
 	};
 
-	if (!userProfile) return null;
+	if (!props.userProfile) return null;
 
 	return (
 		<div className='flex justify-between w-full px-20'>
@@ -50,7 +52,7 @@ export default function InfoSection() {
 							onChange={handleFileUpload}
 						/>
 
-						<Image src={userProfile.image ?? '/noprofile.jpeg'}
+						<Image src={props.userProfile.image ?? '/noprofile.jpeg'}
 							   alt="Image"
 							   layout='fill'
 							   objectFit='cover'
@@ -61,8 +63,8 @@ export default function InfoSection() {
 				</div>
 
 				<div>
-					<h1 className='text-2xl font-bold'>{capitalize(userProfile.name)}</h1>
-					<p className='text-sm'>{userProfile.email}</p>
+					<h1 className='text-2xl font-bold'>{capitalize(props.userProfile.name)}</h1>
+					<p className='text-sm'>{props.userProfile.email}</p>
 				</div>
 			</div>
 

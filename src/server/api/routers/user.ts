@@ -89,10 +89,31 @@ export const userRouter = createTRPCRouter({
 				id: ret.id,
 				name: ret.name,
 				image: ret.image,
+				imageBanner: ret.imageBanner,
 				email: ret.email,
 				followers: ret.followers,
 				following: ret.following,
 				posts: ret.posts
+			}
+		}),
+		updateBannerImage: protectedProcedure
+		.input(z.object({image: z.string()}))
+		.mutation(async ({ctx, input}) => {
+			try {
+				await ctx.db.user.update({
+					where: {
+						id: ctx.session.user.id
+					},
+					data: {
+						imageBanner: input.image
+					}
+				});
+			} catch (err) {
+				console.log(err);
+				throw new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message: "Error updating image",
+				});
 			}
 		}),
 	}
