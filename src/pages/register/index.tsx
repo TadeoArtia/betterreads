@@ -1,10 +1,3 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import Image from "next/legacy/image";
-import Link from "next/link";
-import React from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { Button } from "~/components/shadcn/ui/button";
 import {
   Form,
   FormControl,
@@ -12,9 +5,17 @@ import {
   FormItem,
   FormMessage,
 } from "~/components/shadcn/ui/form";
+
+import { Button } from "~/components/shadcn/ui/button";
+import Image from "next/legacy/image";
 import { Input } from "~/components/shadcn/ui/input";
+import Link from "next/link";
+import React from "react";
 import { Separator } from "~/components/shadcn/ui/separator";
 import { api } from "~/utils/api";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export default function Home() {
   const registerSchema = z
@@ -48,7 +49,6 @@ export default function Home() {
   const onSubmit = async (data: RegisterFormData) => {
     try {
       const response = await createUserMutation.mutateAsync(data);
-      console.log(response);
     } catch (error) {
       console.error(error);
     }

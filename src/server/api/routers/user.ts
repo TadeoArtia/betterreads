@@ -1,13 +1,12 @@
-import { TRPCError } from "@trpc/server";
-import { sha256 } from "js-sha256";
-import { z } from "zod";
-import { env } from "~/env";
-
-
 import {
     createTRPCRouter,
     publicProcedure,
 } from "~/server/api/trpc";
+
+import { TRPCError } from "@trpc/server";
+import { env } from "~/env";
+import { sha256 } from "js-sha256";
+import { z } from "zod";
 
 export const userRouter = createTRPCRouter({
     create: publicProcedure
@@ -41,7 +40,6 @@ export const userRouter = createTRPCRouter({
                 }
             }
             catch (err) {
-                console.log(err);
                 throw new TRPCError({
                     code: "INTERNAL_SERVER_ERROR",
                     message: "Error creating user",

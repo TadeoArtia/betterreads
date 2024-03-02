@@ -1,8 +1,9 @@
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import { Session, getServerSession } from "next-auth";
-import { getProviders } from "next-auth/react";
-import { authOptions } from "~/server/auth";
+
 import Nav from "./Nav";
+import { authOptions } from "~/server/auth";
+import { getProviders } from "next-auth/react";
 
 export default function Layout({
   children,
@@ -10,8 +11,7 @@ export default function Layout({
 }: {
   session: Session | null;
   children: React.ReactNode;
-}) {
-  console.log("LAYOUT", session);
+  }) {
   return (
     <div>
       <Nav session={session} />

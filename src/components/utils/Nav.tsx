@@ -1,11 +1,13 @@
-import Link from "next/link";
-import { Input } from "../shadcn/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "../shadcn/ui/avatar";
-import { Session } from "next-auth";
+
 import { Button } from "../shadcn/ui/button";
+import { Input } from "../shadcn/ui/input";
+import Link from "next/link";
+import { Session } from "next-auth";
+import { useRouter } from "next/router";
 
 export default function Nav({ session }: { session: Session | null }) {
-  console.log(session);
+  const router = useRouter();
   return (
     <nav className="flex items-center gap-5 bg-grey p-4 text-primary">
       {/* TODO Replace h1 with logo */}
@@ -31,7 +33,7 @@ export default function Nav({ session }: { session: Session | null }) {
           </AvatarFallback>
         </Avatar>
       ) : (
-        <Button className="w-32" variant="secondary">
+          <Button className="w-32" variant="secondary" onClick={() => { router.push("/login") }}>
           <p>Sign in</p>
         </Button>
       )}

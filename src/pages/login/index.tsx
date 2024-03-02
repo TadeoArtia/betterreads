@@ -1,26 +1,27 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { getServerSession } from "next-auth";
-import { signIn, getProviders, getCsrfToken } from "next-auth/react";
-import Image from "next/legacy/image";
-import Link from "next/link";
-import router from "next/router";
-import {
-  GetServerSidePropsContext,
-  InferGetServerSidePropsType,
-} from "next/types";
-import React from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { Button } from "~/components/shadcn/ui/button";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
 } from "~/components/shadcn/ui/form";
+import {
+  GetServerSidePropsContext,
+  InferGetServerSidePropsType,
+} from "next/types";
+import { getCsrfToken, getProviders, signIn } from "next-auth/react";
+
+import { Button } from "~/components/shadcn/ui/button";
+import Image from "next/legacy/image";
 import { Input } from "~/components/shadcn/ui/input";
+import Link from "next/link";
+import React from "react";
 import { Separator } from "~/components/shadcn/ui/separator";
 import { authOptions } from "~/server/auth";
+import { getServerSession } from "next-auth";
+import router from "next/router";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export default function Home({
   providers,
@@ -52,7 +53,6 @@ export default function Home({
 
     if (response?.ok) {
       await router.push("/");
-      console.log("Login successful");
     } else {
       // toast({
       //   title: "Error",
@@ -136,7 +136,7 @@ export default function Home({
           <Separator className="my-3 w-3/4" />
 
           <div className="flex w-3/4 flex-col items-center justify-center gap-3 ">
-            {Object.values(providers).map((provider) => (
+            {Object.values(providers).filter((provider) => provider.id !== "credentials").map((provider) => (
               <button
                 key={provider.id}
                 className="w-full rounded-md bg-primary px-4 py-2 text-sm text-background"

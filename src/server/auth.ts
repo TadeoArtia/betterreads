@@ -46,7 +46,7 @@ export const authOptions: NextAuthOptions = {
         ...session,
         user: {
           ...session.user,
-          id: token?.id ?? "",
+          id: token.sub
         },
       }
     },
@@ -73,12 +73,10 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        console.log(credentials);
         if (!credentials || !credentials.username || !credentials.password) return null;
         const user = await db.user.findFirst({
           where: { name: credentials.username },
         });
-        console.log(user);
         const hash = sha256.create();
         hash.update(credentials.password + env.SALT);
         const hex = hash.hex();
