@@ -1,3 +1,4 @@
+import BookSearch, { SearchType } from "~/components/BookSearch";
 import { useEffect, useState } from "react";
 
 import BookCard from "~/components/BookCard";
@@ -40,39 +41,47 @@ export type BookBasicInfo = {
 export default function Home() {
     const session = useSession();
     const router = useRouter();
-    const { query } = router;
-    const page = query.page as string || '1'
-    const [search, setSearch] = useState(query.q)
-    const [debouncedSearch] = useDebounceValue(search, 250)
+    const { q, page, radio } = router.query;
+    const stringQueryParams = { q: q ? q.toString() : '', page: page ? page.toString() : '1', radio: radio ? radio.toString() : 'all' }
 
-    const queryKey = ['search', debouncedSearch, page]
+    const queryKey = ['search', q, page, radio]
 
     const { data: searchResults, isLoading } = useQuery(queryKey, async () => {
-        console.log('searching', debouncedSearch)
-        if (!query.q) return;
-        router.push({ query: { ...query, q: debouncedSearch, page: '1' } });
-        const offset = (parseInt(page) - 1) * pagesize
-        const response = await axios.get('https://openlibrary.org/search.json', {
+        if (!q) return { docs: [] }
+        const offset = (parseInt(stringQueryParams.page) - 1) * pagesize
+        const paramMap: Record<SearchType, string> = {
+            title: 'title',
+            isbn: 'isbn',
+            all: 'q',
+            author: 'author'
+        }
+
+        let response = await axios.get('https://openlibrary.org/search.json', {
             params: {
-                q: debouncedSearch,
+                [paramMap[stringQueryParams.radio as SearchType]]: stringQueryParams.q,
                 limit: pagesize,
                 offset,
                 fields: allFields.join(','),
             }
         })
+        console.log(response.data)
         return response.data
     })
 
-
     return (<Layout session={session.data}>
-        <Input placeholder="Search" value={search} onChange={(e) => setSearch(e.target.value)} />
+        <main className="flex flex-col items-center justify-center w-full flex-1 px-20 py-4 text-center bg-grey-variation">
+            <BookSearch />
 
         {isLoading && <p>Loading...</p>}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 w-full mt-4 px-4 sm:px-0">
+
         {searchResults && searchResults.docs.map((doc: BookBasicInfo) => {
-            return (<div key={doc.key} > {doc.title}
+            return (
                 <BookCard key={doc.key} book={doc} />
-            </div>)
+            )
         })}
 
+            </div>
+        </main>
     </Layout >);
 }
