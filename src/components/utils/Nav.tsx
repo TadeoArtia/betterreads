@@ -9,7 +9,7 @@ export default function Nav({ session }: { session: Session | null }) {
   return (
     <nav className="flex items-center gap-5 bg-grey p-4 text-primary">
       {/* TODO Replace h1 with logo */}
-      <h1 className="text-3xl font-bold text-primary">Betterreads</h1>
+      <h1 className="text-3xl font-bold text-primary">BetterReads</h1>
       <Link href="/home" className="w-fit hover:underline">
         <p>Home</p>
       </Link>
