@@ -19,16 +19,16 @@ export default function Nav({ showSearch = true }: { showSearch?: boolean }) {
 		<nav className="flex items-center gap-5 bg-grey p-4 text-primary">
 			{/* TODO Replace h1 with logo */}
 			<h1 className="text-3xl font-bold text-primary">BetterReads</h1>
-			<Link href="/home" className="w-fit hover:underline">
+			<Link href="/" className="w-fit hover:underline text-nowrap">
 				<p>Home</p>
 			</Link>
-			<Link href="/home" className="w-32 hover:underline">
+			<Link href="/" className="w-32 hover:underline text-nowrap">
 				<p>My Books</p>
 			</Link>
-			<Link href="/home" className="w-20 hover:underline">
+			<Link href="/search" className="w-20 hover:underline text-nowrap">
 				<p>Browse</p>
 			</Link>
-			<Link href="/home" className="w-20 hover:underline">
+			<Link href="/about" className="w-20 hover:underline text-nowrap">
 				<p>About</p>
 			</Link>
 			<Input placeholder="Search" className={`shrink grow bg-white ${showSearch ? "" : "invisible"}`}
