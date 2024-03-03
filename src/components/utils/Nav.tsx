@@ -1,22 +1,20 @@
-import {Session} from "next-auth";
-import {signOut} from "next-auth/react";
-import Link from "next/link";
-import {useRouter} from "next/navigation";
+import { Avatar, AvatarFallback, AvatarImage } from "../shadcn/ui/avatar";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger
 } from "~/components/shadcn/ui/dropdown-menu";
-import {Avatar, AvatarFallback, AvatarImage} from "../shadcn/ui/avatar";
+import { signOut, useSession } from "next-auth/react";
+
 import {Button} from "../shadcn/ui/button";
 import {Input} from "../shadcn/ui/input";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
-export default function Nav({session}: { session: Session | null }) {
-
+export default function Nav({ showSearch = true }: { showSearch?: boolean }) {
 	const router = useRouter();
-
-	console.log(session);
+	const session = useSession();
 	return (
 		<nav className="flex items-center gap-5 bg-grey p-4 text-primary">
 			{/* TODO Replace h1 with logo */}
@@ -33,25 +31,34 @@ export default function Nav({session}: { session: Session | null }) {
 			<Link href="/home" className="w-20 hover:underline">
 				<p>About</p>
 			</Link>
-			<Input placeholder="Search" className="shrink grow bg-white"/>
+			<Input placeholder="Search" className={`shrink grow bg-white ${showSearch ? "" : "invisible"}`}
+				onKeyDown={
+					(event) => {
+						if (event.key === "Enter") {
+							router.push(`/search?q=${event.currentTarget.value}`);
+						}
+					}
+				} />
+
+
 			{session ? (
 				<DropdownMenu>
 					<DropdownMenuTrigger>
 						<Avatar>
-							<AvatarImage src={session.user.image ?? ""} alt="avatar"/>
+							<AvatarImage src={session.data?.user.image ?? ""} alt="avatar" />
 							<AvatarFallback>
-								{session.user.name ? session.user.name[0] : ""}
+								{session.data?.user.name ? session.data.user.name[0] : ""}
 							</AvatarFallback>
 						</Avatar>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent >
-						<DropdownMenuItem onClick={() => router.push('/profile')}>Profile</DropdownMenuItem>
+						<DropdownMenuItem onClick={() => router.push(`/profile/${session.data?.user.id}`)}>Profile</DropdownMenuItem>
 						<DropdownMenuItem onClick={() => signOut({callbackUrl: '/login'})}>Logout</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
 
 			) : (
-				<Button className="w-32" variant="secondary">
+					<Button className="w-32" variant="secondary" onClick={() => router.push('/login')}>
 					<p>Sign in</p>
 				</Button>
 			)}

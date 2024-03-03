@@ -7,14 +7,14 @@ import { getProviders } from "next-auth/react";
 
 export default function Layout({
   children,
-  session,
+  showSearch = true,
 }: {
-  session: Session | null;
   children: React.ReactNode;
+    showSearch?: boolean;
   }) {
   return (
     <div>
-      <Nav session={session} />
+      <Nav showSearch={showSearch} />
       {children}
     </div>
   );

@@ -1,14 +1,10 @@
 import BookSearch, { SearchType } from "~/components/BookSearch";
-import { useEffect, useState } from "react";
 
 import BookCard from "~/components/BookCard";
-import { Input } from "~/components/shadcn/ui/input";
 import Layout from "~/components/utils/Layout";
 import axios from "axios";
-import { useDebounceValue } from 'usehooks-ts'
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
-import { useSession } from "next-auth/react";
 
 const pagesize = 10
 const allFields = [
@@ -39,7 +35,6 @@ export type BookBasicInfo = {
 
 
 export default function Home() {
-    const session = useSession();
     const router = useRouter();
     const { q, page, radio } = router.query;
     const stringQueryParams = { q: q ? q.toString() : '', page: page ? page.toString() : '1', radio: radio ? radio.toString() : 'all' }
@@ -68,7 +63,7 @@ export default function Home() {
         return response.data
     })
 
-    return (<Layout session={session.data}>
+    return (<Layout showSearch={false}>
         <main className="flex flex-col items-center justify-center w-full flex-1 px-20 py-4 text-center bg-grey-variation">
             <BookSearch />
 
@@ -85,3 +80,5 @@ export default function Home() {
         </main>
     </Layout >);
 }
+
+
