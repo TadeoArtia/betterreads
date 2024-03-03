@@ -14,7 +14,56 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Necessary for Next auth
+model Bookshelf {
+  id        String   @id @default(cuid())
+  name      String
+  books     Book[]
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Book {
+  id          String      @id
+  title       String
+  ratings     Rating[]
+  reviews     Review[]
+  bookshelves Bookshelf[]
+  authors      Author[]
+}
+
+model Author {
+  id        String   @id @default(cuid())
+  name      String
+  books     Book[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Rating {
+  id        String   @id @default(cuid())
+  rating    Int
+  book      Book     @relation(fields: [bookId], references: [id])
+  bookId    String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  review    String
+  book      Book     @relation(fields: [bookId], references: [id])
+  bookId    String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// NEXT auth
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -54,6 +103,10 @@ model User {
   followers     Int       @default(0)
   following     Int       @default(0)
   posts         Int       @default(0)
+  rating        Rating[]
+  review        Review[]
+
+  BookShelf Bookshelf[]
 }
 
 model VerificationToken {
