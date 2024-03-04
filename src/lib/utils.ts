@@ -1,6 +1,6 @@
 import axios from "axios";
-import {type ClassValue, clsx} from "clsx"
-import {twMerge} from "tailwind-merge"
+import { type ClassValue, clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
 
 import html from 'remark-html';
 import { remark } from 'remark';
@@ -17,7 +17,7 @@ export function capitalize(str: string | undefined | null) {
 
 export async function uploadImageToImgur(file: Blob) {
 	const data = new FormData();
-	const imageblob = new Blob([file], {type: "image/png"});
+	const imageblob = new Blob([file], { type: "image/png" });
 	data.append("image", imageblob, "image.png");
 
 	try {
@@ -78,4 +78,9 @@ export const getDescription = (searchResults: any) => {
 	parsed = parsed.replaceAll(/href="https:\/\/openlibrary\.org\/works\/([A-Za-z0-9_-]+)(\/[^"]*)?"/g, 'href="/book/$1"');
 	console.log(parsed)
 	return parsed
+}
+
+
+export const isSystemBookshelf = (id: string) => {
+	return id.startsWith("want-to-read-") || id.startsWith("currently-reading-") || id.startsWith("read-");
 }

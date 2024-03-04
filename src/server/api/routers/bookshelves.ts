@@ -8,6 +8,8 @@ import { TRPCError } from "@trpc/server";
 import axios from "axios";
 import { db } from "~/server/db";
 import { z } from "zod";
+import { isSystemBookshelf } from "~/lib/utils";
+
 
 export const bookshelfRouter = createTRPCRouter({
     //   hello: publicProcedure
@@ -34,6 +36,9 @@ export const bookshelfRouter = createTRPCRouter({
             if (!bookshelf) {
                 throw new TRPCError({ code: "NOT_FOUND", message: "Bookshelf not found" });
             }
+            if (isSystemBookshelf(input.id)) {
+                throw new TRPCError({ code: "FORBIDDEN", message: "You cannot edit system bookshelves" });
+            }
             if (bookshelf.userId !== ctx.session.user.id) {
                 throw new TRPCError({ code: "FORBIDDEN", message: "You do not have permission to delete this bookshelf" });
             }
@@ -46,6 +51,9 @@ export const bookshelfRouter = createTRPCRouter({
             if (!bookshelf) {
                 throw new TRPCError({ code: "NOT_FOUND", message: "Bookshelf not found" });
             }
+            if (isSystemBookshelf(input.id)) {
+                throw new TRPCError({ code: "FORBIDDEN", message: "You cannot edit system bookshelves" });
+            }
             if (bookshelf.userId !== ctx.session.user.id) {
                 throw new TRPCError({ code: "FORBIDDEN", message: "You do not have permission to edit this bookshelf" });
             }
@@ -54,7 +62,7 @@ export const bookshelfRouter = createTRPCRouter({
     userBookshelves: publicProcedure
         .input(z.object({ userId: z.string() }))
         .query(async ({ ctx, input }) => {
-            return db.bookshelf.findMany({ where: { userId: input.userId } });
+            return db.bookshelf.findMany({ where: { userId: input.userId }, include: { _count: { select: { books: true } } } });
         }),
     addBookToBookshelf: protectedProcedure
         .input(z.object({ bookId: z.string(), bookshelfId: z.string() }))
@@ -130,3 +138,4 @@ const addBookIfNeeded = async (bookId: string) => {
         })
     }
 }
+

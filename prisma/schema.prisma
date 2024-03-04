@@ -30,7 +30,7 @@ model Book {
   ratings     Rating[]
   reviews     Review[]
   bookshelves Bookshelf[]
-  authors      Author[]
+  authors     Author[]
 }
 
 model Author {
@@ -106,7 +106,7 @@ model User {
   rating        Rating[]
   review        Review[]
 
-  BookShelf Bookshelf[]
+  bookShelf Bookshelf[] // On creation user should have 3 default bookshelves (Read, Currently Reading, Want to Read)
 }
 
 model VerificationToken {

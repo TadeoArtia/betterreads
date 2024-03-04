@@ -41,6 +41,34 @@ declare module "next-auth" {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
+    signIn: async ({ user }) => {
+      const bookshelves = await db.bookshelf.findMany({ where: { userId: user.id } });
+      if (bookshelves.length > 0) {
+        return true;
+      }
+      await db.bookshelf.create({
+        data: {
+          id: `want-to-read-${user.id}`,
+          name: "Want to read",
+          userId: user.id,
+        },
+      });
+      await db.bookshelf.create({
+        data: {
+          id: `currently-reading-${user.id}`,
+          name: "Currently reading",
+          userId: user.id,
+        },
+      });
+      await db.bookshelf.create({
+        data: {
+          id: `read-${user.id}`,
+          name: "Read",
+          userId: user.id,
+        },
+      });
+      return true;
+    },
     session: ({ session, token }) => {
       return {
         ...session,
