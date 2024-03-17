@@ -6,7 +6,9 @@ import {api} from "~/utils/api";
 
 export default function InfoSection(props: {
 	userProfile: any,
-	refetch: any
+	refetch: any,
+	onFollowersClick: () => void,
+	onFollowingClick: () => void
 }) {
 	const session = useSession();
 	const updateImageMutation = api.user.updateProfileImage.useMutation();
@@ -69,15 +71,15 @@ export default function InfoSection(props: {
 			</div>
 
 			<div className='flex justify-between gap-7 self-start pt-2'>
-				<div>
+				<div className='cursor-pointer' onClick={props.onFollowersClick}>
 					<p className='text-sm text-center font-semibold'>10</p>
 					<h1 className='text-sm text-center'>Followers</h1>
 				</div>
-				<div>
+				<div className='cursor-pointer' onClick={props.onFollowingClick}>
 					<p className='text-sm text-center font-semibold'>10</p>
 					<h1 className='text-sm text-center'>Following</h1>
 				</div>
-				<div>
+				<div className='cursor-pointer'>
 					<p className='text-sm text-center font-semibold'>10</p>
 					<h1 className='text-sm text-center'>Posts</h1>
 				</div>

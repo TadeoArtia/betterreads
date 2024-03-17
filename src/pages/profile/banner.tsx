@@ -39,7 +39,7 @@ export default function Banner(props: {
 	if (!props.userProfile) return null;
 
 	return (
-		<div className='w-full bg-white h-1/4 relative'>
+		<div className='w-full bg-white max-h-52 min-h-52 relative'>
 			<input
 				type="file"
 				accept="image/*"
