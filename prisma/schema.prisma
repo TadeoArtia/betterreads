@@ -27,6 +27,7 @@ model Bookshelf {
 model Book {
   id          String      @id
   title       String
+  image      String
   ratings     Rating[]
   reviews     Review[]
   bookshelves Bookshelf[]
