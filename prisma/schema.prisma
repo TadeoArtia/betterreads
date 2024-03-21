@@ -27,6 +27,7 @@ model Bookshelf {
 model Book {
   id          String      @id
   title       String
+  image      String
   ratings     Rating[]
   reviews     Review[]
   bookshelves Bookshelf[]
@@ -106,7 +107,7 @@ model User {
   rating        Rating[]
   review        Review[]
 
-  bookShelf Bookshelf[] // On creation user should have 3 default bookshelves (Read, Currently Reading, Want to Read)
+  bookShelf Bookshelf[]
 }
 
 model VerificationToken {

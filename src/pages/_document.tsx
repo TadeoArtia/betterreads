@@ -11,6 +11,8 @@ export default function Document() {
           rel="stylesheet"
         />
         <link rel="icon" href="/favicon.png" />
+
+        {/* mobile */}
         <title>Betterreads</title>
       </Head>
       <body>

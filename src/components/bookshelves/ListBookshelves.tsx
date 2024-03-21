@@ -4,18 +4,23 @@ import { useState, useEffect } from "react";
 import { Button } from "~/components/shadcn/ui/button";
 import { isSystemBookshelf } from "~/lib/utils";
 import { api } from "~/utils/api";
-import CreateShelfDialog from "./[id]/CreateShelfDialog";
+import CreateShelfDialog from "./CreateShelfDialog";
 import { Separator } from "~/components/shadcn/ui/separator";
 import { Dialog, DialogTrigger } from "~/components/shadcn/ui/dialog";
 
-export default function ListBookshelves({ userId }: { userId: string }) {
-  const {
-    data: userBookshelves,
-    isLoading,
-    refetch,
-  } = api.bookshelves.userBookshelves.useQuery({
-    userId,
-  });
+export default function ListBookshelves({
+  userId,
+  selectedBookshelfId,
+  setSelectedBookshelfId,
+}: {
+  userId: string;
+  selectedBookshelfId: string;
+  setSelectedBookshelfId: (id: string) => void;
+}) {
+  const { data: userBookshelves, refetch } =
+    api.bookshelves.userBookshelves.useQuery({
+      userId,
+    });
 
   const [isMounted, setIsMounted] = useState(false);
 
@@ -31,25 +36,25 @@ export default function ListBookshelves({ userId }: { userId: string }) {
       {userBookshelves
         ?.filter((x) => isSystemBookshelf(x.id))
         .map((bookshelf) => (
-          <Link
+          <button
             key={bookshelf.id}
-            href={`/bookshelves/${id}/${bookshelf.id}`}
-            className="hover:underline"
+            onClick={() => setSelectedBookshelfId(bookshelf.id)}
+            className={`${selectedBookshelfId == bookshelf.id ? "font-medium" : ""} w-full px-4 py-2 text-left hover:underline`}
           >
             {bookshelf.name} ({bookshelf._count.books})
-          </Link>
+          </button>
         ))}
       <Separator />
       {userBookshelves
         ?.filter((x) => !isSystemBookshelf(x.id))
         .map((bookshelf) => (
-          <Link
+          <button
             key={bookshelf.id}
-            href={`/bookshelves/${id}/${bookshelf.id}`}
-            className="hover:underline"
+            onClick={() => setSelectedBookshelfId(bookshelf.id)}
+            className={`${selectedBookshelfId == bookshelf.id ? "font-medium" : ""} w-full px-4 py-2 text-left hover:underline`}
           >
             {bookshelf.name} ({bookshelf._count.books})
-          </Link>
+          </button>
         ))}
       {isMounted ? (
         <Dialog open={open} onOpenChange={setOpen}>

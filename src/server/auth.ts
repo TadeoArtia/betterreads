@@ -10,8 +10,7 @@ import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { env } from "~/env";
 import { db } from "~/server/db";
-import { sha256 } from 'js-sha256';
-
+import { sha256 } from "js-sha256";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -41,42 +40,14 @@ declare module "next-auth" {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    signIn: async ({ user }) => {
-      const bookshelves = await db.bookshelf.findMany({ where: { userId: user.id } });
-      if (bookshelves.length > 0) {
-        return true;
-      }
-      await db.bookshelf.create({
-        data: {
-          id: `want-to-read-${user.id}`,
-          name: "Want to read",
-          userId: user.id,
-        },
-      });
-      await db.bookshelf.create({
-        data: {
-          id: `currently-reading-${user.id}`,
-          name: "Currently reading",
-          userId: user.id,
-        },
-      });
-      await db.bookshelf.create({
-        data: {
-          id: `read-${user.id}`,
-          name: "Read",
-          userId: user.id,
-        },
-      });
-      return true;
-    },
     session: ({ session, token }) => {
       return {
         ...session,
         user: {
           ...session.user,
-          id: token.sub
+          id: token.sub,
         },
-      }
+      };
     },
     async jwt({ user, token }) {
       //   update token from user
@@ -91,8 +62,8 @@ export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(db) as Adapter,
   providers: [
     GoogleProvider({
-      clientId: "",
-      clientSecret: "",
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
     }),
     CredentialsProvider({
       name: "Credentials",
@@ -101,7 +72,8 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials || !credentials.username || !credentials.password) return null;
+        if (!credentials || !credentials.username || !credentials.password)
+          return null;
         const user = await db.user.findFirst({
           where: { name: credentials.username },
         });
@@ -112,11 +84,11 @@ export const authOptions: NextAuthOptions = {
           const { password, ...userdata } = user;
           return userdata;
         } else {
-          console.log('error');
+          console.log("error");
           return null;
         }
       },
-    })
+    }),
     /**
      * ...add more providers here.
      *
@@ -129,7 +101,7 @@ export const authOptions: NextAuthOptions = {
   ],
   session: {
     strategy: "jwt",
-  }
+  },
 };
 
 /**

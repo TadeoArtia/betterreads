@@ -19,7 +19,12 @@ const config = {
   },
   images: {
     domains: ["i.imgur.com"],
-  }
+    remotePatterns: [
+      {
+        hostname: "*.googleusercontent.com",
+      },
+    ],
+  },
 };
 
 export default config;
