@@ -72,11 +72,11 @@ export default function InfoSection(props: {
 
 			<div className='flex justify-between gap-7 self-start pt-2'>
 				<div className='cursor-pointer' onClick={props.onFollowersClick}>
-					<p className='text-sm text-center font-semibold'>10</p>
+					<p className='text-sm text-center font-semibold'>{props.userProfile.followers.length}</p>
 					<h1 className='text-sm text-center'>Followers</h1>
 				</div>
 				<div className='cursor-pointer' onClick={props.onFollowingClick}>
-					<p className='text-sm text-center font-semibold'>10</p>
+					<p className='text-sm text-center font-semibold'>{props.userProfile.following.length}</p>
 					<h1 className='text-sm text-center'>Following</h1>
 				</div>
 				<div className='cursor-pointer'>

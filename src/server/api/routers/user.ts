@@ -1,14 +1,14 @@
-import { createTRPCRouter, protectedProcedure, publicProcedure, } from "~/server/api/trpc";
-
-import { TRPCError } from "@trpc/server";
-import { env } from "~/env";
-import { sha256 } from "js-sha256";
-import { z } from "zod";
+import {inferAsyncReturnType, TRPCError} from "@trpc/server";
+import {sha256} from "js-sha256";
+import {z} from "zod";
+import {env} from "~/env";
+import {createTRPCRouter, protectedProcedure, publicProcedure,} from "~/server/api/trpc";
+import {db} from "~/server/db";
 
 export const userRouter = createTRPCRouter({
-	create: publicProcedure
-		.input(z.object({ email: z.string(), password: z.string(), username: z.string() }))
-		.mutation(async ({ ctx, input }) => {
+		create: publicProcedure
+		.input(z.object({email: z.string(), password: z.string(), username: z.string()}))
+		.mutation(async ({ctx, input}) => {
 			try {
 				const user = await ctx.db.user.findUnique({
 					where: {
@@ -43,9 +43,9 @@ export const userRouter = createTRPCRouter({
 				});
 			}
 		}),
-	updateProfileImage: protectedProcedure
-		.input(z.object({ image: z.string() }))
-		.mutation(async ({ ctx, input }) => {
+		updateProfileImage: protectedProcedure
+		.input(z.object({image: z.string()}))
+		.mutation(async ({ctx, input}) => {
 			try {
 				await ctx.db.user.update({
 					where: {
@@ -63,16 +63,12 @@ export const userRouter = createTRPCRouter({
 				});
 			}
 		}),
-	getUserProfile: publicProcedure
-		.input(z.object({ id: z.string() }))
-		.query(async ({ ctx, input }) => {
-			let ret;
+		getUserProfile: publicProcedure
+		.input(z.object({id: z.string()}))
+		.query(async ({ctx, input}) => {
+			let ret: inferAsyncReturnType<typeof getUserWithFollowers> | null = null
 			try {
-				ret = await ctx.db.user.findUnique({
-					where: {
-						id: input.id
-					}
-				});
+				ret = await getUserWithFollowers(input.id);
 			} catch (err) {
 				console.log(err);
 				throw new TRPCError({
@@ -90,14 +86,16 @@ export const userRouter = createTRPCRouter({
 				image: ret.image,
 				imageBanner: ret.imageBanner,
 				email: ret.email,
-				followers: ret.followers,
-				following: ret.following,
-				posts: ret.posts
+				posts: ret.posts,
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
+				followers: ret.followers.map(f => f.follower),
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
+				following: ret.following.map(f => f.following)
 			}
 		}),
-	updateBannerImage: protectedProcedure
-		.input(z.object({ image: z.string() }))
-		.mutation(async ({ ctx, input }) => {
+		updateBannerImage: protectedProcedure
+		.input(z.object({image: z.string()}))
+		.mutation(async ({ctx, input}) => {
 			try {
 				await ctx.db.user.update({
 					where: {
@@ -115,5 +113,71 @@ export const userRouter = createTRPCRouter({
 				});
 			}
 		}),
-}
+		addFollowingRelationship: protectedProcedure
+		.input(z.object({id: z.string()}))
+		.mutation(async ({ctx, input}) => {
+			try {
+				console.log("Adding following relationship", input.id, ctx.session.user.id);
+				await ctx.db.userRelation.create({
+					data: {
+						following: {
+							connect: {
+								id: input.id
+							}
+						},
+						follower: {
+							connect: {
+								id: ctx.session.user.id
+							}
+						}
+					}
+				});
+			} catch (err) {
+				console.log(err);
+				throw new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message: "Error following user",
+				});
+			}
+		}),
+		removeFollowingRelationship: protectedProcedure
+		.input(z.object({followerId: z.string(), followingId: z.string()}))
+		.mutation(async ({ctx, input}) => {
+			try {
+				await ctx.db.userRelation.deleteMany({
+					where: {
+						followingId: input.followingId,
+						followerId: input.followerId
+					}
+				});
+			} catch (err) {
+				console.log(err);
+				throw new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message: "Error unfollowing user",
+				});
+			}
+		}),
+	}
 )
+
+async function getUserWithFollowers(id: string) {
+	const user = await db.user.findUnique({
+		where: {
+			id: id
+		},
+		include: {
+			following: {
+				include: {
+					following: true
+				}
+			},
+			followers: {
+				include: {
+					follower: true
+				}
+			},
+		}
+	});
+	return user;
+}
