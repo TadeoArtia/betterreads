@@ -41,6 +41,7 @@ export default function Home() {
       bookId: params.id,
       bookshelfId: `want-to-read-${session.data.user.id}`,
     });
+    console.log("BOOK ADDED");
   };
 
   if (isLoading || authorLoading) return <div>Loading...</div>;

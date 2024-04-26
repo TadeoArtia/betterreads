@@ -22,7 +22,7 @@ export default function Nav({ showSearch = true }: { showSearch?: boolean }) {
 			<Link href="/" className="w-fit hover:underline text-nowrap">
 				<p>Home</p>
 			</Link>
-			<Link href="/" className="w-32 hover:underline text-nowrap">
+			<Link href={`/bookshelves/${session.data?.user.id}`} className="w-32 hover:underline text-nowrap">
 				<p>My Books</p>
 			</Link>
 			<Link href="/search" className="w-20 hover:underline text-nowrap">

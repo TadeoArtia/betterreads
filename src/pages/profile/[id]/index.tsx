@@ -1,8 +1,9 @@
 import {createServerSideHelpers} from "@trpc/react-query/server";
 import {useParams} from "next/navigation";
 import {GetServerSidePropsContext} from "next/types";
-import {useEffect, useState} from "react";
+import React, {useState} from "react";
 import SuperJSON from "superjson";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "~/components/shadcn/ui/tooltip";
 import Layout from "~/components/utils/Layout";
 import Banner from "~/pages/profile/banner";
 import Card from "~/pages/profile/cards";
@@ -10,8 +11,6 @@ import InfoSection from "~/pages/profile/infoSection";
 import {appRouter} from "~/server/api/root";
 import {db} from "~/server/db";
 import {api} from "~/utils/api";
-
-const cards = [1, 2, 3, 4];
 
 export default function Profile() {
 	const params = useParams<{ id: string }>();
@@ -22,13 +21,12 @@ export default function Profile() {
 		refetch: refetchInternal,
 	} = api.user.getUserProfile.useQuery({id: params.id});
 
-	async function refetch(){
+	async function refetch() {
 		await refetchInternal();
-		if(showFollowers){
+		if (showFollowers) {
 			handleFollowersClick()
 			handleFollowingClick()
-		}
-		else{
+		} else {
 			handleFollowingClick()
 			handleFollowersClick()
 		}
@@ -63,8 +61,23 @@ export default function Profile() {
 					<>
 						<div
 							className="flex w-full flex-grow flex-col gap-5 bg-grey-variation px-40 py-10 bg-blend-color">
-							<h1 className='text-4xl font-bold'>Followers</h1>
-							<Card data={userProfile?.followers ?? []} followingList={false} owner={userProfile} refetch={refetch}/>
+							<div className='flex justify-between pr-8 items-center'>
+								<h1 className='text-4xl font-bold'>Followers</h1>
+								<TooltipProvider>
+									<Tooltip>
+										<TooltipTrigger>
+											<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="var(--primary)" className="w-6 h-6">
+												<path d="M8.5 4.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0ZM10 13c.552 0 1.01-.452.9-.994a5.002 5.002 0 0 0-9.802 0c-.109.542.35.994.902.994h8ZM12.5 3.5a.75.75 0 0 1 .75.75v1h1a.75.75 0 0 1 0 1.5h-1v1a.75.75 0 0 1-1.5 0v-1h-1a.75.75 0 0 1 0-1.5h1v-1a.75.75 0 0 1 .75-.75Z" />
+											</svg>
+										</TooltipTrigger>
+										<TooltipContent>
+											<p>Search people to follow</p>
+										</TooltipContent>
+									</Tooltip>
+								</TooltipProvider>
+							</div>
+							<Card data={userProfile?.followers ?? []} followingList={false} owner={userProfile}
+								  refetch={refetch}/>
 						</div>
 					</>
 				)}
@@ -73,8 +86,23 @@ export default function Profile() {
 					<>
 						<div
 							className="flex w-full flex-grow flex-col gap-5 bg-grey-variation px-40 py-10 bg-blend-color">
-							<h1 className='text-4xl font-bold'>Following</h1>
-							<Card data={userProfile?.following || []} followingList={true} owner={userProfile} refetch={refetch}/>
+							<div className='flex justify-between pr-8 items-center'>
+								<h1 className='text-4xl font-bold'>Following</h1>
+								<TooltipProvider>
+									<Tooltip>
+										<TooltipTrigger>
+											<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-6 h-6">
+												<path d="M8.5 4.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0ZM10 13c.552 0 1.01-.452.9-.994a5.002 5.002 0 0 0-9.802 0c-.109.542.35.994.902.994h8ZM12.5 3.5a.75.75 0 0 1 .75.75v1h1a.75.75 0 0 1 0 1.5h-1v1a.75.75 0 0 1-1.5 0v-1h-1a.75.75 0 0 1 0-1.5h1v-1a.75.75 0 0 1 .75-.75Z" />
+											</svg>
+										</TooltipTrigger>
+										<TooltipContent>
+											<p>Search people to follow</p>
+										</TooltipContent>
+									</Tooltip>
+								</TooltipProvider>
+							</div>
+							<Card data={userProfile?.following || []} followingList={true} owner={userProfile}
+								  refetch={refetch}/>
 						</div>
 					</>
 				)}

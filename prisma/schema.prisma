@@ -27,7 +27,7 @@ model Bookshelf {
 model Book {
   id          String      @id
   title       String
-  image      String
+  image       String
   ratings     Rating[]
   reviews     Review[]
   bookshelves Bookshelf[]
@@ -92,28 +92,28 @@ model Session {
 }
 
 model User {
-  id            String        @id @default(cuid())
+  id            String         @id @default(cuid())
   name          String?
-  email         String?       @unique
+  email         String?        @unique
   emailVerified DateTime?
   image         String?
   imageBanner   String?
   accounts      Account[]
   sessions      Session[]
-  password      String?       // ONLY FOR LOCAL AUTH
+  password      String? // ONLY FOR LOCAL AUTH
   followers     UserRelation[] @relation("followers")
   following     UserRelation[] @relation("following")
-  posts         Int           @default(0)
+  posts         Int            @default(0)
   rating        Rating[]
   review        Review[]
-  bookShelves   Bookshelf[]   // On creation, a user should have 3 default bookshelves (Read, Currently Reading, Want to Read)
+  bookShelves   Bookshelf[] // On creation, a user should have 3 default bookshelves (Read, Currently Reading, Want to Read)
 }
 
 model UserRelation {
-  id        String @id @default(cuid())
-  follower  User   @relation("following", fields: [followerId], references: [id])
-  followerId String
-  following User   @relation("followers", fields: [followingId], references: [id])
+  id          String @id @default(cuid())
+  follower    User   @relation("following", fields: [followerId], references: [id])
+  followerId  String
+  following   User   @relation("followers", fields: [followingId], references: [id])
   followingId String
 
   @@index([followerId], name: "followerId")
