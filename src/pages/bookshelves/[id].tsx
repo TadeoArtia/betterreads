@@ -1,6 +1,5 @@
 import {createServerSideHelpers} from "@trpc/react-query/server";
 import {GetServerSidePropsContext} from "next";
-import {refreshReducer} from "next/dist/client/components/router-reducer/reducers/refresh-reducer";
 import {useParams} from "next/navigation";
 import {useRef, useState} from "react";
 import SuperJSON from "superjson";
@@ -18,20 +17,23 @@ export default function Bookshelves() {
 
 	const ref = useRef<ListBookshelvesRef>(null);
 
-	function refreshList()
-	{
-		ref?.current.refresh()
+	function refreshList() {
+		ref?.current?.refresh()
 	}
 
 	return (
 		<Layout>
 			<main className="flex  w-full flex-1 justify-between bg-grey-variation px-20 py-4 gap-7">
-				<ListBookshelves
-					userId={userId}
-					selectedBookshelfId={selectedBookshelfId}
-					setSelectedBookshelfId={setSelectedBookshelfId}
-					ref={ref}
-				/>
+				<div className='flex flex-col justify-start'>
+					<ListBookshelves
+						userId={userId}
+						selectedBookshelfId={selectedBookshelfId}
+						setSelectedBookshelfId={setSelectedBookshelfId}
+						ref={ref}
+					/>
+					TEST
+				</div>
+
 				<section className="flex grow">
 					<BookShelfDetails bookshelfId={selectedBookshelfId} userId={userId} refreshList={refreshList}/>
 				</section>

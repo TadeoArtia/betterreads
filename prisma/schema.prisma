@@ -55,7 +55,8 @@ model Rating {
 
 model Review {
   id        String   @id @default(cuid())
-  review    String
+  rating    Int
+  review    String?
   book      Book     @relation(fields: [bookId], references: [id])
   bookId    String
   user      User     @relation(fields: [userId], references: [id])

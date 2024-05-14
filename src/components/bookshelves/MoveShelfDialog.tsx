@@ -24,10 +24,9 @@ import {api} from "~/utils/api";
 
 
 export default function MoveShelfDialog({
-											setIsOpen, refetch, book, bookshelfId, userId
+											setIsOpen, book, bookshelfId, userId
 										}: {
-	setIsOpen: (isOpen: boolean) => void;
-	refetch: () => Promise<any>;
+	setIsOpen: () => void;
 	book: Book,
 	bookshelfId: string, userId: string
 }) {
@@ -57,8 +56,7 @@ export default function MoveShelfDialog({
 			bookshelfId: value,
 			bookId: book.id
 		})
-		await refetch()
-		setIsOpen(false);
+		setIsOpen();
 	}
 
 	return (

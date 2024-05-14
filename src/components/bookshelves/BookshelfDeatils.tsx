@@ -1,7 +1,7 @@
 import {type Book} from "@prisma/client";
-import {useRef, useState} from "react";
-import {ListBookshelvesRef} from "~/components/bookshelves/ListBookshelves";
+import {useState} from "react";
 import MoveShelfDialog from "~/components/bookshelves/MoveShelfDialog";
+import ReviewBookDialog from "~/components/bookshelves/ReviewBookDialog";
 import {Button} from "~/components/shadcn/ui/button";
 import {Dialog, DialogTrigger} from "~/components/shadcn/ui/dialog";
 import {api} from "~/utils/api";
@@ -20,12 +20,13 @@ export default function BookShelfDetails({
 
 	const removeBookMutation = api.bookshelves.removeBookFromBookshelf.useMutation();
 	const [open, setOpen] = useState(false);
+	const [openReview, setOpenReview] = useState(false);
 
 	if (isLoading || !bookshelfData) {
 		return <p>Loading...</p>;
 	}
 
-	function refetchFull(){
+	function refetchFull() {
 		console.log("refetching")
 		refreshList()
 		refetch();
@@ -58,20 +59,35 @@ export default function BookShelfDetails({
 									<p>{book.authors[0]?.name ?? ""}</p>
 								</div>
 							</div>
-							<div className='flex justify-center'>
+							<div className='flex justify-center gap-2'>
 								<Button onClick={() => onRemoveBook(book)}>Remove</Button>
 								<Dialog open={open} onOpenChange={setOpen}>
 									<DialogTrigger asChild>
 										<Button>Change bookshelf</Button>
 									</DialogTrigger>
 									<MoveShelfDialog
-										setIsOpen={(isOpen) => {
-											setOpen(isOpen);
+										setIsOpen={() => {
+											setOpen(v => !v);
+											refetchFull();
 										}}
-										refetch={refetchFull}
 										userId={userId}
 										book={book}
 										bookshelfId={bookshelfId}
+									/>
+								</Dialog>
+								<Dialog open={openReview} onOpenChange={setOpenReview}>
+									<DialogTrigger asChild>
+										<Button>Review</Button>
+									</DialogTrigger>
+									<ReviewBookDialog
+										setIsOpen={() => {
+											setOpenReview(v => !v);
+											refetchFull();
+										}}
+										userId={userId}
+										book={book}
+										bookshelfId={bookshelfId}
+										isOpen={openReview}
 									/>
 								</Dialog>
 							</div>

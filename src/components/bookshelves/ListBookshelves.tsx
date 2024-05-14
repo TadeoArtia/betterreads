@@ -41,7 +41,7 @@ const ListBookshelves = forwardRef<ListBookshelvesRef, Props>((props, ref) => {
 	const [open, setOpen] = useState(false);
 	const {id} = useParams<{ id: string }>();
 	return (
-		<aside className="flex w-1/6 max-w-xs flex-1 flex-col  items-start justify-start  gap-4 bg-grey-variation py-4">
+		<aside className="flex w-1/6 max-w-xs flex-col  items-start justify-start  gap-4 bg-grey-variation py-4">
 			<h3 className="w-full text-lg font-medium">Bookshelves</h3>
 			{userBookshelves
 			?.filter((x) => isSystemBookshelf(x.id))
