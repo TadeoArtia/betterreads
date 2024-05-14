@@ -8,12 +8,17 @@ import {db} from "~/server/db";
 export const bookshelfRouter = createTRPCRouter({
 	getBookshelf: publicProcedure
 	.input(z.object({id: z.string()}))
-	.query(async ({input}) => {
+	.query(async ({ctx, input}) => {
 		const bookshelf = await db.bookshelf.findUnique({
 			where: {id: input.id},
 			include: {
 				books: {
-					include: {authors: true},
+					include: {
+						authors: true,
+						reviews: {
+							where: {userId: ctx?.session?.user.id,} // Filter reviews by userId
+						}
+					},
 				},
 			},
 		});
@@ -166,6 +171,27 @@ export const bookshelfRouter = createTRPCRouter({
 	addReview: protectedProcedure
 	.input(z.object({bookId: z.string(), rating: z.number(), review: z.string().optional()}))
 	.mutation(async ({ctx, input}) => {
+
+		const review = await db.review.findFirst({
+			where: {
+				userId: ctx.session.user.id,
+				bookId: input.bookId,
+			},
+		});
+
+		if (review) {
+			await db.review.update({
+				where: {
+					id: review.id,
+				},
+				data: {
+					rating: input.rating,
+					review: input.review ?? "",
+				},
+			});
+			return;
+		}
+
 		await db.review.create({
 			data: {
 				bookId: input.bookId,

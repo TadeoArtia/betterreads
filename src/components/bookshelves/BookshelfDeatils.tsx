@@ -57,6 +57,7 @@ export default function BookShelfDetails({
 								<div className="flex flex-col gap-2">
 									<h2 className="text-lg font-medium">{book.title}</h2>
 									<p>{book.authors[0]?.name ?? ""}</p>
+									{book.reviews && <p>Your rating: {book.reviews[0].rating}/5 </p>}
 								</div>
 							</div>
 							<div className='flex justify-center gap-2'>
