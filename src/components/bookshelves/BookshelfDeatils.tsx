@@ -1,4 +1,5 @@
 import {type Book} from "@prisma/client";
+import {useRouter} from "next/router";
 import {useState} from "react";
 import MoveShelfDialog from "~/components/bookshelves/MoveShelfDialog";
 import ReviewBookDialog from "~/components/bookshelves/ReviewBookDialog";
@@ -21,6 +22,8 @@ export default function BookShelfDetails({
 	const removeBookMutation = api.bookshelves.removeBookFromBookshelf.useMutation();
 	const [open, setOpen] = useState(false);
 	const [openReview, setOpenReview] = useState(false);
+	const router = useRouter();
+
 
 	if (isLoading || !bookshelfData) {
 		return <p>Loading...</p>;
@@ -32,6 +35,9 @@ export default function BookShelfDetails({
 		refetch();
 	}
 
+	const handleBookClick = async (bookId: string) => {
+		await router.push('/book/' + bookId);
+	}
 	const onRemoveBook = async (book: Book) => {
 		await removeBookMutation.mutateAsync({
 			bookshelfId,
@@ -47,17 +53,19 @@ export default function BookShelfDetails({
 			{bookshelfData ? (
 				<ul className="flex flex-col gap-2 w-full">
 					{bookshelfData.books.map((book) => (
-						<li key={book.id} className="flex w-full justify-between">
+						<li key={book.id} className="flex w-full justify-between cursor-pointer">
 							<div className='flex gap-2'>
 								<img
 									src={book.image ?? "/book-placeholder.svg"}
 									alt={book.title}
+									onClick={() => handleBookClick(book.id)}
 									className="h-30 w-20 object-cover"
 								/>
 								<div className="flex flex-col gap-2">
 									<h2 className="text-lg font-medium">{book.title}</h2>
 									<p>{book.authors[0]?.name ?? ""}</p>
-									{book.reviews && <p>Your rating: {book.reviews[0].rating}/5 </p>}
+									{book.reviews && book.reviews[0]?.rating &&
+                                        <p>Your rating: {book.reviews[0].rating}/5 </p>}
 								</div>
 							</div>
 							<div className='flex justify-center gap-2'>

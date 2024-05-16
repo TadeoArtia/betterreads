@@ -30,6 +30,18 @@ export const bookshelfRouter = createTRPCRouter({
 		}
 		return bookshelf;
 	}),
+	getReviews: publicProcedure
+	.input(z.object({id: z.string()}))
+	.query(async ({ctx, input}) => {
+		const reviews = await db.review.findMany({
+			where: {bookId: input.id},
+			include: {
+				user: true,
+			},
+			take: 20,
+		});
+		return reviews;
+	}),
 	create: protectedProcedure
 	.input(z.object({name: z.string().min(1)}))
 	.mutation(async ({ctx, input}) => {

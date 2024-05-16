@@ -8,6 +8,7 @@ import axios from "axios";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import UserReviews from "~/pages/book/[id]/userReviews";
 import { api } from "~/utils/api";
 import { useSession } from "next-auth/react";
 
@@ -107,6 +108,7 @@ export default function Home() {
           })}
         </section>
       </main>
+      <UserReviews book={searchResults}/>
     </Layout>
   );
 }
