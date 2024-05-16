@@ -55,6 +55,7 @@ export default function ReviewBookDialog({
 	useEffect(() => {
 		setChoseRating(0);
 		setReview("");
+		console.log("ESTE ES EL LIBRO", book.id)
 	}, [isOpen]);
 
 

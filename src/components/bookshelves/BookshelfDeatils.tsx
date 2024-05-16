@@ -22,6 +22,7 @@ export default function BookShelfDetails({
 	const removeBookMutation = api.bookshelves.removeBookFromBookshelf.useMutation();
 	const [open, setOpen] = useState(false);
 	const [openReview, setOpenReview] = useState(false);
+	const [selectedBook, setSelectedBook] = useState("");
 	const router = useRouter();
 
 
@@ -70,13 +71,17 @@ export default function BookShelfDetails({
 							</div>
 							<div className='flex justify-center gap-2'>
 								<Button onClick={() => onRemoveBook(book)}>Remove</Button>
-								<Dialog open={open} onOpenChange={setOpen}>
+								<Dialog open={open && book.id == selectedBook} onOpenChange={() => {
+									setOpenReview(true);
+									setSelectedBook(book.id)
+								}}>
 									<DialogTrigger asChild>
 										<Button>Change bookshelf</Button>
 									</DialogTrigger>
 									<MoveShelfDialog
 										setIsOpen={() => {
 											setOpen(v => !v);
+											setSelectedBook("");
 											refetchFull();
 										}}
 										userId={userId}
@@ -84,19 +89,24 @@ export default function BookShelfDetails({
 										bookshelfId={bookshelfId}
 									/>
 								</Dialog>
-								<Dialog open={openReview} onOpenChange={setOpenReview}>
+								<Dialog open={openReview && book.id == selectedBook} onOpenChange={() => {
+									setOpenReview(true);
+									setSelectedBook(book.id)
+								}}>
 									<DialogTrigger asChild>
 										<Button>Review</Button>
 									</DialogTrigger>
 									<ReviewBookDialog
 										setIsOpen={() => {
 											setOpenReview(v => !v);
+											setSelectedBook("");
 											refetchFull();
 										}}
 										userId={userId}
 										book={book}
 										bookshelfId={bookshelfId}
 										isOpen={openReview}
+										key={book.id}
 									/>
 								</Dialog>
 							</div>

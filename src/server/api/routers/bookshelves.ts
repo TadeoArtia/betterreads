@@ -38,7 +38,6 @@ export const bookshelfRouter = createTRPCRouter({
 			include: {
 				user: true,
 			},
-			take: 20,
 		});
 		return reviews;
 	}),
@@ -191,27 +190,25 @@ export const bookshelfRouter = createTRPCRouter({
 			},
 		});
 
+		console.log("ESTOY ESCRIBIENDO EN", input.bookId)
+
 		if (review) {
-			await db.review.update({
+			await db.review.delete({
 				where: {
 					id: review.id,
 				},
-				data: {
-					rating: input.rating,
-					review: input.review ?? "",
-				},
 			});
-			return;
 		}
 
 		await db.review.create({
 			data: {
-				bookId: input.bookId,
 				userId: ctx.session.user.id,
 				rating: input.rating,
 				review: input.review ?? "",
+				bookId: input.bookId,
 			},
 		});
+
 	}),
 	removeBookFromBookshelf: protectedProcedure
 	.input(z.object({bookId: z.string(), bookshelfId: z.string()}))
